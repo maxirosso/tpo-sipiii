@@ -2,26 +2,26 @@ import React from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const { control, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    axios.post('http://localhost:5000/api/login', data)
-      .then(response => {
-        // Navigate to Card List on successful login
-        navigation.navigate('Card List');
-      })
-      .catch(error => {
-        console.error(error);
-      });
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post('http://192.168.100.36:5000/api/login', data);
+      const token = response.data.token; // Assuming the token is returned as response.data.token
+      await AsyncStorage.setItem('token', token); // Store the token in AsyncStorage
+      navigation.navigate('MainTabs'); // Navigate to the MainTabs screen on successful login
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text>Login</Text>
 
-      {/* Username Field */}
       <Controller
         control={control}
         name="username"
@@ -38,7 +38,6 @@ const LoginScreen = ({ navigation }) => {
       />
       {errors.username && <Text style={styles.errorText}>Username is required.</Text>}
 
-      {/* Password Field */}
       <Controller
         control={control}
         name="password"
@@ -57,8 +56,6 @@ const LoginScreen = ({ navigation }) => {
       {errors.password && <Text style={styles.errorText}>Password is required.</Text>}
 
       <Button title="Login" onPress={handleSubmit(onSubmit)} />
-      
-      {/* Register Button */}
       <Button title="Register" onPress={() => navigation.navigate('Register')} />
     </View>
   );

@@ -6,23 +6,20 @@ import axios from 'axios';
 const RegisterScreen = ({ navigation }) => {
   const { control, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = (data) => {
-    axios.post('http://localhost:5000/api/register', data)
-      .then(response => {
-        // On successful registration, navigate to the Login screen
-        alert('Registration successful!');
-        navigation.navigate('Login');
-      })
-      .catch(error => {
-        console.error(error);
-      });
+  const onSubmit = async (data) => {
+    try {
+      await axios.post('http://192.168.100.36:5000/api/register', data);
+      alert('Registration successful!');
+      navigation.navigate('Login');
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <View style={styles.container}>
       <Text>Register</Text>
 
-      {/* Email Field */}
       <Controller
         control={control}
         name="email"
@@ -40,7 +37,6 @@ const RegisterScreen = ({ navigation }) => {
       />
       {errors.email && <Text style={styles.errorText}>Email is required.</Text>}
 
-      {/* Username Field */}
       <Controller
         control={control}
         name="username"
@@ -57,7 +53,6 @@ const RegisterScreen = ({ navigation }) => {
       />
       {errors.username && <Text style={styles.errorText}>Username is required.</Text>}
 
-      {/* Password Field */}
       <Controller
         control={control}
         name="password"
